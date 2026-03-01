@@ -2,14 +2,14 @@ let milliseconds = 0;
 let interval;
 let running = false;
 
-//reference to handle HTML elements and events
+//reference to handle HTML elements
 const displayEl = document.getElementById("display");
 const btnStartPauseEl = document.getElementById("btn-start-pause");
 const lapBtnEl = document.getElementById("btn-lap");
 const lapListEl = document.getElementById("lap-list");
 const restartBtnEl = document.getElementById("btn-restart");
 
-//reference to HTML elements with events
+//events
 btnStartPauseEl.addEventListener("click", stopwatchState);
 lapBtnEl.addEventListener("click", setLap);
 restartBtnEl.addEventListener("click", /*PLACEHOLDER*/);
@@ -40,8 +40,11 @@ function stopwatchState(){
 }
 
 function setLap(){
-    if(milliseconds > 0){
+    if(milliseconds > 0 && running){
         const li = document.createElement("li");
-
+        li.textContent = `Volta:  ${TimeFormat(milliseconds)}`;
+        lapListEl.appendChild(li);
+    }else{
+        alert("Must be running to make a lap!");
     }
 }
