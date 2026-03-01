@@ -12,7 +12,7 @@ const restartBtnEl = document.getElementById("btn-restart");
 //events
 btnStartPauseEl.addEventListener("click", stopwatchState);
 lapBtnEl.addEventListener("click", setLap);
-restartBtnEl.addEventListener("click", /*PLACEHOLDER*/);
+restartBtnEl.addEventListener("click", clearStopWatch);
 
 function TimeFormat(ms){
     const data = new Date(ms);
@@ -47,4 +47,13 @@ function setLap(){
     }else{
         alert("Must be running to make a lap!");
     }
+}
+
+function clearStopWatch(){
+    clearInterval(interval);
+    milliseconds = 0;
+    running = false;
+    displayEl.textContent = "00:00:00.00";
+    btnStartPauseEl.textContent = "Start";
+    lapListEl.innerHTML = "";
 }
