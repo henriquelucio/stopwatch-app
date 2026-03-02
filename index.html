@@ -3,18 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StopWatch</title>
+    <title>Stopwatch</title>
     <script src="main.js" defer></script>
 </head>
 <body>
-    <h1>StopWatch</h1>
+    <h1>Stopwatch</h1>
     <div class="stopwatch">
-        <div id="display">00:00.00</div>
+        <div id="display">00:00:00.00</div>
         <button id="btn-start-pause">Start</button>
         <button id="btn-lap">Lap</button>
         <button id="btn-restart">Restart</button>
 
-        <ul id="lap-list"></ul>
+        <table id="lap-table" >
+            <caption>
+                Time table
+            </caption>
+            <thead>
+                <tr>
+                    <th>Lap Number</th>
+                    <th>Split Time</th>
+                    <th>Total Time</th>
+                </tr>
+            </thead>
+            <tbody id="lap-table-body">
+                
+            </tbody>
+
+        </table>
     </div>
 </body>
 </html>

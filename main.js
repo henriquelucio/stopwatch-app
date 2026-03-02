@@ -1,4 +1,6 @@
 let milliseconds = 0;
+let lastLapTime = 0;
+let lapCounter = 0;
 let interval;
 let running = false;
 
@@ -6,7 +8,8 @@ let running = false;
 const displayEl = document.getElementById("display");
 const btnStartPauseEl = document.getElementById("btn-start-pause");
 const lapBtnEl = document.getElementById("btn-lap");
-const lapListEl = document.getElementById("lap-list");
+const lapTableEl = document.getElementById("lap-table");
+const lapTableBodyEl = document.getElementById("lap-table-body");
 const restartBtnEl = document.getElementById("btn-restart");
 
 //events
@@ -42,9 +45,12 @@ function stopwatchState(){
 
 function setLap(){
     if(milliseconds > 0 && running){
-        const li = document.createElement("li");
-        li.textContent = `Volta:  ${TimeFormat(milliseconds)}`;
-        lapListEl.appendChild(li);
+        lapTableEl.hidden = false;
+        lapCounter++;
+        const currentSplit = milliseconds - lastLapTime;
+        const newRow = tableRowCreator(lapCounter, TimeFormat(currentSplit), TimeFormat(milliseconds));
+        lapTableBodyEl.prepend(newRow);
+        lastLapTime = milliseconds;
     }else{
         lapBtnEl.disable = !running;
         alert("Must be running to make a lap!");
@@ -53,9 +59,29 @@ function setLap(){
 
 function clearStopWatch(){
     clearInterval(interval);
-    milliseconds = 0;
+    milliseconds = 0;                       //zero var and disable
+    lastLapTime = 0;
     running = false;
-    displayEl.textContent = TimeFormat(0);
-    btnStartPauseEl.textContent = "Start";
-    lapListEl.innerHTML = "";
+    lapTableEl.hidden = true;               //Clear tables
+    lapTableBodyEl.innerHTML = "";  
+    displayEl.textContent = TimeFormat(0);  //Clear display
+    btnStartPauseEl.textContent = "Start";  //Change main button text
+}
+
+function tableRowCreator(lapCounter, currentSplit, milliseconds){
+    const row = document.createElement("tr");
+
+    const cellNumber = document.createElement("td");
+    const cellSplit = document.createElement("td");
+    const cellTotal = document.createElement("td");
+
+    cellNumber.textContent = `Lap #${lapCounter}`;
+    cellSplit.textContent = currentSplit;
+    cellTotal.textContent = milliseconds;
+
+    row.appendChild(cellNumber);
+    row.appendChild(cellSplit);
+    row.appendChild(cellTotal);
+
+    return row;
 }
