@@ -1,10 +1,12 @@
+let startTime;
+let interval;
+let accumulatedTime = 0;
 let milliseconds = 0;
 let lastLapTime = 0;
 let lapCounter = 0;
-let interval;
 let running = false;
 
-//reference to handle HTML elements
+//Reference to handle HTML elements
 const displayEl = document.getElementById("display");
 const btnStartPauseEl = document.getElementById("btn-start-pause");
 const lapBtnEl = document.getElementById("btn-lap");
@@ -12,11 +14,12 @@ const lapTableEl = document.getElementById("lap-table");
 const lapTableBodyEl = document.getElementById("lap-table-body");
 const restartBtnEl = document.getElementById("btn-restart");
 
-//events
+//Events
 btnStartPauseEl.addEventListener("click", stopwatchState);
 lapBtnEl.addEventListener("click", setLap);
 restartBtnEl.addEventListener("click", clearStopWatch);
 
+//Time format function
 function TimeFormat(ms){
     const data = new Date(ms);
     const hour = data.getUTCHours().toString().padStart(2, "0");
@@ -31,8 +34,11 @@ function stopwatchState(){
         //Start the stopwatch
         running = !running;
         btnStartPauseEl.textContent = "Pause";
+
+        startTime = performance.now() - accumulatedTime;
+
         interval = setInterval(() => {
-            milliseconds += 10;
+            milliseconds = performance.now() - startTime;
             displayEl.textContent = TimeFormat(milliseconds);
         }, 10);
     }else{
@@ -40,6 +46,8 @@ function stopwatchState(){
         running = !running;
         btnStartPauseEl.textContent = "Continue";
         clearInterval(interval);
+
+        accumulatedTime = milliseconds;
     }
 }
 
