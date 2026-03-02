@@ -52,8 +52,7 @@ function stopwatchState(){
 }
 
 function setLap(){
-    if(milliseconds > 0 && running){
-        lapTableEl.hidden = false;
+    if(milliseconds > 0 && lastLapTime != milliseconds){
         lapCounter++;
         const currentSplit = milliseconds - lastLapTime;
         const newRow = tableRowCreator(lapCounter, TimeFormat(currentSplit), TimeFormat(milliseconds));
@@ -69,9 +68,10 @@ function clearStopWatch(){
     clearInterval(interval);
     milliseconds = 0;                       //zero var and disable
     lastLapTime = 0;
-    running = false;
-    lapTableEl.hidden = true;               //Clear tables
-    lapTableBodyEl.innerHTML = "";  
+    accumulatedTime = 0;
+    lapCounter = 0;
+    running = false;        
+    lapTableBodyEl.innerHTML = "";          //Clear tables
     displayEl.textContent = TimeFormat(0);  //Clear display
     btnStartPauseEl.textContent = "Start";  //Change main button text
 }
