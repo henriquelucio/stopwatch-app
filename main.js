@@ -16,10 +16,11 @@ restartBtnEl.addEventListener("click", clearStopWatch);
 
 function TimeFormat(ms){
     const data = new Date(ms);
+    const hour = data.getUTCHours().toString().padStart(2, "0");
     const min = data.getUTCMinutes().toString().padStart(2, "0");
     const seg = data.getUTCSeconds().toString().padStart(2, "0");
     const mseg = Math.floor(data.getUTCMilliseconds() / 10).toString().padStart(2, "0");
-    return `${min}:${seg}.${mseg}`;
+    return `${hour}:${min}:${seg}.${mseg}`;
 }
 
 function stopwatchState(){
@@ -45,6 +46,7 @@ function setLap(){
         li.textContent = `Volta:  ${TimeFormat(milliseconds)}`;
         lapListEl.appendChild(li);
     }else{
+        lapBtnEl.disable = !running;
         alert("Must be running to make a lap!");
     }
 }
@@ -53,7 +55,7 @@ function clearStopWatch(){
     clearInterval(interval);
     milliseconds = 0;
     running = false;
-    displayEl.textContent = "00:00:00.00";
+    displayEl.textContent = TimeFormat(0);
     btnStartPauseEl.textContent = "Start";
     lapListEl.innerHTML = "";
 }
