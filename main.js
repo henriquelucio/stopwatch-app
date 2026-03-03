@@ -5,6 +5,7 @@ let milliseconds = 0;
 let lastLapTime = 0;
 let lapCounter = 0;
 let running = false;
+let lapSplits = [];
 
 //Reference to handle HTML elements
 const displayEl = document.getElementById("display");
@@ -37,17 +38,16 @@ function stopwatchState(){
 
         startTime = performance.now() - accumulatedTime;
 
-        interval = setInterval(() => {
+        interval = setInterval(() => {                          //Update display every 10 milliseconds
             milliseconds = performance.now() - startTime;
             displayEl.textContent = TimeFormat(milliseconds);
         }, 10);
     }else{
-        //pause the stopwatch
-        running = !running;
+        running = !running;                                     //Pause Stopwatch
         btnStartPauseEl.textContent = "Continue";
-        clearInterval(interval);
+        clearInterval(interval);                                //Pause display update
 
-        accumulatedTime = milliseconds;
+        accumulatedTime = milliseconds;                         //Stores total time to continue
     }
 }
 
@@ -55,11 +55,14 @@ function setLap(){
     if(milliseconds > 0 && lastLapTime != milliseconds){
         lapCounter++;
         const currentSplit = milliseconds - lastLapTime;
+        lapSplits.push(currentSplit);
         const newRow = tableRowCreator(lapCounter, TimeFormat(currentSplit), TimeFormat(milliseconds));
+        newRow.setAttribute("data-index", lapCounter - 1);
         lapTableBodyEl.prepend(newRow);
         lastLapTime = milliseconds;
+        updateTableHighlights();
     }else{
-        lapBtnEl.disable = !running;
+        lapBtnEl.disabled = !running;
         alert("Must be running to make a lap!");
     }
 }
@@ -70,26 +73,62 @@ function clearStopWatch(){
     lastLapTime = 0;
     accumulatedTime = 0;
     lapCounter = 0;
+    lapSplits = [];
     running = false;        
     lapTableBodyEl.innerHTML = "";          //Clear tables
     displayEl.textContent = TimeFormat(0);  //Clear display
     btnStartPauseEl.textContent = "Start";  //Change main button text
 }
 
-function tableRowCreator(lapCounter, currentSplit, milliseconds){
+function getExtreme(){                                          //Create a Index for fastest and slowest lap
+    if (lapSplits.length < 2) return {minIdx: -1, maxIdx: -1};  //Check if has at least 2 laps
+
+    let minIdx = 0;
+    let maxIdx = 0;
+
+    for(let i = 1; i < lapSplits.length; i++){                  //Loop to set index
+        if (lapSplits[i] < lapSplits[minIdx]) minIdx = i;       //Fastest Index
+        if (lapSplits[i] > lapSplits[maxIdx]) maxIdx = i;       //Slowest Index
+    }
+
+    return {minIdx, maxIdx};
+}
+
+function tableRowCreator(lapNum, split, total){
     const row = document.createElement("tr");
 
     const cellNumber = document.createElement("td");
+    cellNumber.classList.add("lap-id");
     const cellSplit = document.createElement("td");
     const cellTotal = document.createElement("td");
 
-    cellNumber.textContent = `Lap #${lapCounter}`;
-    cellSplit.textContent = currentSplit;
-    cellTotal.textContent = milliseconds;
+    cellNumber.textContent = `Lap #${lapNum}`;
+    cellSplit.textContent = split;
+    cellTotal.textContent = total;
 
     row.appendChild(cellNumber);
     row.appendChild(cellSplit);
     row.appendChild(cellTotal);
 
     return row;
+}
+
+function updateTableHighlights(){
+    const {minIdx, maxIdx} = getExtreme();
+    const rows = lapTableBodyEl.querySelectorAll("tr");
+
+    rows.forEach(row => {
+        const idx = parseInt(row.getAttribute("data-index"));
+        const cellNumber = row.querySelector(".lap-id");
+
+        cellNumber.textContent = `Lap #${idx + 1}`;
+
+        if(lapSplits.length < 2) return;
+
+        if(idx === minIdx){
+            cellNumber.textContent += " Fastest";
+        }else if(idx === maxIdx){
+            cellNumber.textContent += " Slowest";
+        }
+    })
 }
