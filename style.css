@@ -1,0 +1,111 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+    background-color: #121212;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 50px;
+}
+
+h1 {
+    color: #00ff88;
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+}
+
+.stopwatch {
+    width: 90%;
+    max-width: 500px;
+    background: #1e1e1e;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+    text-align: center;
+}
+
+#display {
+    font-family: 'Courier New', monospace;
+    font-size: 3.5rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+    color: #00ff88; /* Verde neon para brilho */
+    text-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+}
+
+button {
+    padding: 12px 24px;
+    margin: 5px;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+#btn-start-pause { background-color: #2ecc71; color: white; }
+#btn-start-pause:hover { background-color: #27ae60; }
+
+#btn-lap { background-color: #3498db; color: white; }
+#btn-lap:hover { background-color: #2980b9; }
+
+#btn-restart { background-color: #e74c3c; color: white; }
+#btn-restart:hover { background-color: #c0392b; }
+
+button:disabled {
+    background-color: #555 !important;
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+table {
+    width: 100%;
+    margin-top: 2rem;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+caption {
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #aaa;
+}
+
+th {
+    border-bottom: 2px solid #333;
+    padding: 10px;
+    color: #00ff88;
+}
+
+td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #333;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #252525;
+}
+
+.lap-id {
+    font-weight: bold;
+    text-align: left;
+}
+
+.fastest-row {
+    color: #00ff88 !important;
+    font-weight: bold;
+}
+
+.slowest-row {
+    color: #ff4d4d !important;
+    font-weight: bold;
+}
