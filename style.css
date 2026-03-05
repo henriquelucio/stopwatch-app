@@ -52,8 +52,8 @@ button {
     transition: all 0.2s ease;
 }
 
-#btn-start-pause { background-color: #2ecc71; color: white; }
-#btn-start-pause:hover { background-color: #27ae60; }
+#btn-start-pause { background-color: #23af5d; color: white; }
+#btn-start-pause:hover { background-color: #1a8f4a; }
 
 #btn-lap { background-color: #3498db; color: white; }
 #btn-lap:hover { background-color: #2980b9; }

@@ -3,20 +3,18 @@ let interval;
 let accumulatedTime = 0;
 let milliseconds = 0;
 let lastLapTime = 0;
-let lapCounter = 0;
 let running = false;
-let lapSplits = [];
+let lapData = [];
 
 //Reference to handle HTML elements
-const displayEl = document.getElementById("display");
-const btnStartPauseEl = document.getElementById("btn-start-pause");
+const startPauseBtnEl = document.getElementById("btn-start-pause");
 const lapBtnEl = document.getElementById("btn-lap");
-const lapTableEl = document.getElementById("lap-table");
-const lapTableBodyEl = document.getElementById("lap-table-body");
 const restartBtnEl = document.getElementById("btn-restart");
+const displayEl = document.getElementById("display");
+const lapTableBodyEl = document.getElementById("lap-table-body");
 
 //Events
-btnStartPauseEl.addEventListener("click", stopwatchState);
+startPauseBtnEl.addEventListener("click", stopwatchState);
 lapBtnEl.addEventListener("click", setLap);
 restartBtnEl.addEventListener("click", clearStopWatch);
 
@@ -32,20 +30,17 @@ function TimeFormat(ms){
 }
 
 function stopwatchState(){
-    if(!running){
-        running = !running;                                     //Start Stopwatch
-        btnStartPauseEl.textContent = "Pause";                  //Change text from start/PAUSE/continue btn
+    running = !running;                                         //Toggle stopwatch state
+    if(running){
+        startPauseBtnEl.textContent = "Pause";                  //Change text from start/PAUSE/continue btn
         startTime = performance.now() - accumulatedTime;        //Sets the time stopwatch starts or calculate it to continue
         interval = setInterval(() => {                          //Update main time var every 10 milliseconds
             milliseconds = performance.now() - startTime;       //Calculate time elapsed since begin
             displayEl.textContent = TimeFormat(milliseconds);   //Change time in display and format it
         }, 10);
-        if(lapBtnEl.disabled){                                  //Check button state
-            lapBtnEl.disabled = false;                          //Enable it
-        }
+            lapBtnEl.disabled = false;                          //Enable lap button
     }else{
-        running = !running;                                     //Pause Stopwatch
-        btnStartPauseEl.textContent = "Continue";               //Change text from start/pause/CONTINUE btn
+        startPauseBtnEl.textContent = "Continue";               //Change text from start/pause/CONTINUE btn
         clearInterval(interval);                                //Pause update on main time var
         accumulatedTime = milliseconds;                         //Stores total time to calculate continue
     }
@@ -53,13 +48,18 @@ function stopwatchState(){
 
 function setLap(){
     if(milliseconds > 0 && lastLapTime != milliseconds){
-        lapCounter++;                                           //Increases lap count
         const currentSplit = milliseconds - lastLapTime;        //Sets the value of current split
-        lapSplits.push(currentSplit);                           //Add it at the end of an array
-        //set var for new row with lap number, split time and total time
-        const newRow = tableRowCreator(lapCounter, TimeFormat(currentSplit), TimeFormat(milliseconds));
-        newRow.setAttribute("data-index", lapCounter - 1);      //Set a index for reference so we check the fastest and slowest
-        lapTableBodyEl.prepend(newRow);                         //Add the new lap line at the end of table body
+        const lapNumber = lapData.length + 1;                   //Use array index for set lap number
+        //Creates row
+        const {row, cellNumber} = tableRowCreator(TimeFormat(currentSplit), TimeFormat(milliseconds));
+        cellNumber.textContent = `Lap #${lapNumber}`;           //Set lap text
+        lapData.push({                                          //Save data and html tags reference in array
+            splitMs: currentSplit,                              //split time
+            rowEl: row,                                         //tag <tr>
+            cellNumEl: cellNumber,                              //tag <td> of number
+            lapIndex: lapNumber                                 //lap number
+        });
+        lapTableBodyEl.prepend(row);                            //Add the new lap line at the end of table body
         lastLapTime = milliseconds;                             //Reference the actual time for use in future
         updateTableHighlights();                                //Update table highlights
         if(!running){                                           //Check running state
@@ -75,33 +75,20 @@ function clearStopWatch(){
     milliseconds = 0;                                           //clear vars
     lastLapTime = 0;
     accumulatedTime = 0;
-    lapCounter = 0;
-    lapSplits = [];
+    lapData = [];
     running = false;                                            //Disable stopwatch
     lapTableBodyEl.innerHTML = "";                              //Clear tables
     displayEl.textContent = TimeFormat(0);                      //Clear display
-    btnStartPauseEl.textContent = "Start";                      //Change main button text
+    startPauseBtnEl.textContent = "Start";                      //Change main button text
+    lapBtnEl.disabled = true;
 }
 
-function getExtreme(){                                          //Create a Index for fastest and slowest lap
-    if (lapSplits.length < 2) return {minIdx: -1, maxIdx: -1};  //Check if has at least 2 laps
-    let minIdx = 0;                                             
-    let maxIdx = 0;
-    for(let i = 1; i < lapSplits.length; i++){                  //Loop to set index
-        if (lapSplits[i] < lapSplits[minIdx]) minIdx = i;       //Fastest Index
-        if (lapSplits[i] > lapSplits[maxIdx]) maxIdx = i;       //Slowest Index
-    }
-    return {minIdx, maxIdx};
-}
-
-function tableRowCreator(lapNum, split, total){                 //Creates a row to show lap info
+function tableRowCreator(split, total){                         //Creates a row to show lap info
     const row = document.createElement("tr");
     const cellNumber = document.createElement("td");
-    cellNumber.classList.add("lap-id");                         //Add lap-id to reference
     const cellSplit = document.createElement("td");
     const cellTotal = document.createElement("td");
-
-    cellNumber.textContent = `Lap #${lapNum}`;                  
+               
     cellSplit.textContent = split;
     cellTotal.textContent = total;
 
@@ -109,28 +96,32 @@ function tableRowCreator(lapNum, split, total){                 //Creates a row 
     row.appendChild(cellSplit);
     row.appendChild(cellTotal);
 
-    return row;
+    return {row, cellNumber};
+}
+
+function getExtreme(){                                          //Create a Index for fastest and slowest lap
+    if (lapData.length < 2) return {minIdx: -1, maxIdx: -1};    //Check if has at least 2 laps
+    let minIdx = 0;                                             
+    let maxIdx = 0;
+    for(let i = 1; i < lapData.length; i++){                    //Loop to set index
+        if (lapData[i].splitMs < lapData[minIdx].splitMs) minIdx = i;       //Fastest Index
+        if (lapData[i].splitMs > lapData[maxIdx].splitMs) maxIdx = i;       //Slowest Index
+    }
+    return {minIdx, maxIdx};
 }
 
 function updateTableHighlights(){
     const {minIdx, maxIdx} = getExtreme();
-    const rows = lapTableBodyEl.querySelectorAll("tr");
-
-    rows.forEach(row => {
-        const idx = parseInt(row.getAttribute("data-index"));
-        console.log(idx);
-        const cellNumber = row.querySelector(".lap-id");
-        console.log(cellNumber);
-        row.classList.remove("fastest-row", "slowest-row");
-        cellNumber.textContent = `Lap #${idx + 1}`;
-        if(lapSplits.length < 2) return;
-
-        if(idx === minIdx){
-            cellNumber.textContent += " Fastest";
-            row.classList.add("fastest-row");
-        }else if(idx === maxIdx){
-            cellNumber.textContent += " Slowest";
-            row.classList.add("slowest-row");
+    lapData.forEach((lap, index) => {
+        lap.rowEl.classList.remove("fastest-row", "slowest-row");
+        lap.cellNumEl.textContent = `Lap #${lap.lapIndex}`;
+        if(lapData.length < 2) return;
+        if(index === minIdx){
+            lap.cellNumEl.textContent += " Fastest";
+            lap.rowEl.classList.add("fastest-row");
+        }else if(index === maxIdx){
+            lap.cellNumEl.textContent += " Slowest";
+            lap.rowEl.classList.add("slowest-row");
         }
     })
 }
