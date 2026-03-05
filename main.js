@@ -40,6 +40,9 @@ function stopwatchState(){
             milliseconds = performance.now() - startTime;       //Calculate time elapsed since begin
             displayEl.textContent = TimeFormat(milliseconds);   //Change time in display and format it
         }, 10);
+        if(lapBtnEl.disabled){                                  //Check button state
+            lapBtnEl.disabled = false;                          //Enable it
+        }
     }else{
         running = !running;                                     //Pause Stopwatch
         btnStartPauseEl.textContent = "Continue";               //Change text from start/pause/CONTINUE btn
@@ -59,8 +62,10 @@ function setLap(){
         lapTableBodyEl.prepend(newRow);                         //Add the new lap line at the end of table body
         lastLapTime = milliseconds;                             //Reference the actual time for use in future
         updateTableHighlights();                                //Update table highlights
+        if(!running){                                           //Check running state
+            lapBtnEl.disabled = true;                           //Disable lap button
+        }
     }else{
-        lapBtnEl.disabled = !running;                           //Change stopwatch state
         alert("Must be running to make a lap!");                //The user receives an alert to provide instructions
     }
 }
@@ -89,15 +94,14 @@ function getExtreme(){                                          //Create a Index
     return {minIdx, maxIdx};
 }
 
-function tableRowCreator(lapNum, split, total){
+function tableRowCreator(lapNum, split, total){                 //Creates a row to show lap info
     const row = document.createElement("tr");
-
     const cellNumber = document.createElement("td");
-    cellNumber.classList.add("lap-id");
+    cellNumber.classList.add("lap-id");                         //Add lap-id to reference
     const cellSplit = document.createElement("td");
     const cellTotal = document.createElement("td");
 
-    cellNumber.textContent = `Lap #${lapNum}`;
+    cellNumber.textContent = `Lap #${lapNum}`;                  
     cellSplit.textContent = split;
     cellTotal.textContent = total;
 
@@ -114,7 +118,9 @@ function updateTableHighlights(){
 
     rows.forEach(row => {
         const idx = parseInt(row.getAttribute("data-index"));
+        console.log(idx);
         const cellNumber = row.querySelector(".lap-id");
+        console.log(cellNumber);
         row.classList.remove("fastest-row", "slowest-row");
         cellNumber.textContent = `Lap #${idx + 1}`;
         if(lapSplits.length < 2) return;
