@@ -95,11 +95,6 @@ tbody tr:nth-child(even) {
     background-color: #252525;
 }
 
-.lap-id {
-    font-weight: bold;
-    text-align: left;
-}
-
 .fastest-row {
     color: #00ff88 !important;
     font-weight: bold;

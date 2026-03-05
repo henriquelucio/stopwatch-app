@@ -80,7 +80,7 @@ function clearStopWatch(){
     lapTableBodyEl.innerHTML = "";                              //Clear tables
     displayEl.textContent = TimeFormat(0);                      //Clear display
     startPauseBtnEl.textContent = "Start";                      //Change main button text
-    lapBtnEl.disabled = true;
+    lapBtnEl.disabled = true;                                   //Disable lap button
 }
 
 function tableRowCreator(split, total){                         //Creates a row to show lap info
@@ -110,9 +110,9 @@ function getExtreme(){                                          //Create a Index
     return {minIdx, maxIdx};
 }
 
-function updateTableHighlights(){
-    const {minIdx, maxIdx} = getExtreme();
-    lapData.forEach((lap, index) => {
+function updateTableHighlights(){                               //Update table to show fastest and slowest lap
+    const {minIdx, maxIdx} = getExtreme();                      //Get index from function
+    lapData.forEach((lap, index) => {                           
         lap.rowEl.classList.remove("fastest-row", "slowest-row");
         lap.cellNumEl.textContent = `Lap #${lap.lapIndex}`;
         if(lapData.length < 2) return;
